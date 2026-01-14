@@ -74,6 +74,7 @@ import {
   Package,
   ArrowRight,
   ArrowLeft,
+  Pencil,
 } from "lucide-react";
 import { CLIENTS } from "./Clients";
 
@@ -316,6 +317,10 @@ const ClientDetails = () => {
   const [noteSummary, setNoteSummary] = useState("");
   const [noteDescription, setNoteDescription] = useState("");
   const [noteOrigin, setNoteOrigin] = useState<string>("");
+  const [isEditAddressDialogOpen, setIsEditAddressDialogOpen] = useState(false);
+  const [editedResidentialAddress, setEditedResidentialAddress] = useState({ line1: "", line2: "", line3: "" });
+  const [editedMailingAddress, setEditedMailingAddress] = useState({ line1: "", line2: "", line3: "" });
+  const [editedContact, setEditedContact] = useState({ home: "", cell: "", email: "" });
   const [notesSearchTerm, setNotesSearchTerm] = useState("");
   const [notesFilterType, setNotesFilterType] = useState<string>("all");
   const [notesDateSortOrder, setNotesDateSortOrder] = useState<"asc" | "desc">("desc");
@@ -3244,14 +3249,27 @@ const ClientDetails = () => {
 
   const clientContactInfo = getClientContactInfo(id);
 
+  // State for address information (allows editing)
+  const [currentResidentialAddress, setCurrentResidentialAddress] = useState(clientContactInfo.residentialAddress);
+  const [currentMailingAddress, setCurrentMailingAddress] = useState(clientContactInfo.mailingAddress);
+  const [currentContact, setCurrentContact] = useState(clientContactInfo.contact);
+
+  // Update state when client changes
+  useEffect(() => {
+    const contactInfo = getClientContactInfo(id);
+    setCurrentResidentialAddress(contactInfo.residentialAddress);
+    setCurrentMailingAddress(contactInfo.mailingAddress);
+    setCurrentContact(contactInfo.contact);
+  }, [id]);
+
   // Mock data for the client details
   const clientDetails = {
     totalAssets: calculateTotalAssets(),
     totalTrades: 45,
     joinDate: "2024-01-15",
-    residentialAddress: clientContactInfo.residentialAddress,
-    mailingAddress: clientContactInfo.mailingAddress,
-    contact: clientContactInfo.contact,
+    residentialAddress: currentResidentialAddress,
+    mailingAddress: currentMailingAddress,
+    contact: currentContact,
     representative: {
       name: "Marsh, Antoine",
       id: "9823-2232",
@@ -4211,31 +4229,53 @@ const ClientDetails = () => {
               {/* Residential Address Card - Full width */}
               <Card className="border border-gray-200 shadow-sm bg-white col-span-2">
                 <CardHeader className="pb-0.5 px-2 pt-1.5 relative">
-                  <CardTitle className="text-[10px] font-semibold text-gray-900">Residential Address</CardTitle>
-                  {clientDetails.mailingAddress && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="absolute top-1.5 right-2 text-blue-600 cursor-help text-[10px] font-bold">*</span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <div className="space-y-1">
-                          <p className="font-semibold">Mailing Address:</p>
-                          <p>{clientDetails.mailingAddress.line1}</p>
-                          {clientDetails.mailingAddress.line2 && <p>{clientDetails.mailingAddress.line2}</p>}
-                          {clientDetails.mailingAddress.line3 && <p>{clientDetails.mailingAddress.line3}</p>}
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
+                  <div className="grid grid-cols-2 gap-2 items-center">
+                    <div className="flex items-center">
+                      <CardTitle className="text-[10px] font-semibold text-gray-900">Residential Address</CardTitle>
+                    </div>
+                    <div className="flex items-center justify-start gap-2 pl-2">
+                      <CardTitle className="text-[10px] font-semibold text-gray-900">Mailing Address</CardTitle>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-1.5 right-2 h-2.5 w-2.5 p-0 hover:bg-transparent transition-all duration-200 hover:drop-shadow-[0_0_4px_rgba(59,130,246,0.5)]"
+                    onClick={() => {
+                      setEditedResidentialAddress({ ...clientDetails.residentialAddress });
+                      setEditedMailingAddress(clientDetails.mailingAddress ? { ...clientDetails.mailingAddress } : { line1: "", line2: "", line3: "" });
+                      setEditedContact({ ...clientDetails.contact });
+                      setIsEditAddressDialogOpen(true);
+                    }}
+                  >
+                    <Pencil className="h-1.5 w-1.5 text-gray-500 hover:text-blue-600 transition-colors" />
+                  </Button>
                 </CardHeader>
                 <CardContent className="pt-0 pb-1 px-2">
-                  <p className="text-[10px] text-gray-700 break-words">
-                    {clientDetails.residentialAddress.line1}
-                    {clientDetails.residentialAddress.line2 && `, ${clientDetails.residentialAddress.line2}`}
-                    {clientDetails.residentialAddress.line3 && `, ${clientDetails.residentialAddress.line3}`}
-                  </p>
-                  <p className="text-[9px] text-gray-700 mt-0.5"><span className="font-semibold">Home:</span> {clientDetails.contact.home} | <span className="font-semibold">Cell:</span> {clientDetails.contact.cell}</p>
-                  <p className="text-[9px] text-gray-700 mt-0.5"><span className="font-semibold">Email:</span> {clientDetails.contact.email}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* Left Column - Residential Address */}
+                    <div className="pr-2 border-r border-gray-300">
+                      <p className="text-[10px] text-gray-700 break-words">
+                        {clientDetails.residentialAddress.line1}
+                        {clientDetails.residentialAddress.line2 && `, ${clientDetails.residentialAddress.line2}`}
+                        {clientDetails.residentialAddress.line3 && `, ${clientDetails.residentialAddress.line3}`}
+                      </p>
+                      <p className="text-[9px] text-gray-700 mt-0.5"><span className="font-semibold">Home:</span> {clientDetails.contact.home} | <span className="font-semibold">Cell:</span> {clientDetails.contact.cell}</p>
+                      <p className="text-[9px] text-gray-700 mt-0.5"><span className="font-semibold">Email:</span> {clientDetails.contact.email}</p>
+                    </div>
+                    {/* Right Column - Mailing Address */}
+                    <div className="pl-2">
+                      {clientDetails.mailingAddress ? (
+                        <p className="text-[10px] text-gray-700 break-words">
+                          {clientDetails.mailingAddress.line1}
+                          {clientDetails.mailingAddress.line2 && `, ${clientDetails.mailingAddress.line2}`}
+                          {clientDetails.mailingAddress.line3 && `, ${clientDetails.mailingAddress.line3}`}
+                        </p>
+                      ) : (
+                        <p className="text-[10px] text-gray-500 italic">No mailing address on file</p>
+                      )}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -14712,6 +14752,184 @@ const ClientDetails = () => {
               disabled={!standaloneSelectedFund || !standaloneAmount}
             >
               Place Order
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Address Dialog */}
+      <Dialog open={isEditAddressDialogOpen} onOpenChange={setIsEditAddressDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Address Information</DialogTitle>
+            <DialogDescription>
+              Update residential address, mailing address, and contact information.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Residential Address Section */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-gray-900 border-b pb-2">Residential Address</h3>
+              <div className="space-y-2">
+                <Label htmlFor="res-line1" className="text-sm font-medium text-gray-700">
+                  Address Line 1 <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="res-line1"
+                  value={editedResidentialAddress.line1}
+                  onChange={(e) =>
+                    setEditedResidentialAddress({ ...editedResidentialAddress, line1: e.target.value })
+                  }
+                  placeholder="Enter address line 1"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="res-line2" className="text-sm font-medium text-gray-700">
+                  Address Line 2
+                </Label>
+                <Input
+                  id="res-line2"
+                  value={editedResidentialAddress.line2}
+                  onChange={(e) =>
+                    setEditedResidentialAddress({ ...editedResidentialAddress, line2: e.target.value })
+                  }
+                  placeholder="Enter address line 2 (optional)"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="res-line3" className="text-sm font-medium text-gray-700">
+                  City, State, ZIP <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="res-line3"
+                  value={editedResidentialAddress.line3}
+                  onChange={(e) =>
+                    setEditedResidentialAddress({ ...editedResidentialAddress, line3: e.target.value })
+                  }
+                  placeholder="Enter city, state, ZIP"
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            {/* Mailing Address Section */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-gray-900 border-b pb-2">Mailing Address</h3>
+              <div className="space-y-2">
+                <Label htmlFor="mail-line1" className="text-sm font-medium text-gray-700">
+                  Address Line 1
+                </Label>
+                <Input
+                  id="mail-line1"
+                  value={editedMailingAddress.line1}
+                  onChange={(e) =>
+                    setEditedMailingAddress({ ...editedMailingAddress, line1: e.target.value })
+                  }
+                  placeholder="Enter mailing address line 1 (optional)"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="mail-line2" className="text-sm font-medium text-gray-700">
+                  Address Line 2
+                </Label>
+                <Input
+                  id="mail-line2"
+                  value={editedMailingAddress.line2}
+                  onChange={(e) =>
+                    setEditedMailingAddress({ ...editedMailingAddress, line2: e.target.value })
+                  }
+                  placeholder="Enter mailing address line 2 (optional)"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="mail-line3" className="text-sm font-medium text-gray-700">
+                  City, State, ZIP
+                </Label>
+                <Input
+                  id="mail-line3"
+                  value={editedMailingAddress.line3}
+                  onChange={(e) =>
+                    setEditedMailingAddress({ ...editedMailingAddress, line3: e.target.value })
+                  }
+                  placeholder="Enter city, state, ZIP (optional)"
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            {/* Contact Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-semibold text-gray-900 border-b pb-2">Contact Information</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="contact-home" className="text-sm font-medium text-gray-700">
+                    Home Phone
+                  </Label>
+                  <Input
+                    id="contact-home"
+                    value={editedContact.home}
+                    onChange={(e) =>
+                      setEditedContact({ ...editedContact, home: e.target.value })
+                    }
+                    placeholder="Enter home phone"
+                    className="w-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="contact-cell" className="text-sm font-medium text-gray-700">
+                    Cell Phone
+                  </Label>
+                  <Input
+                    id="contact-cell"
+                    value={editedContact.cell}
+                    onChange={(e) =>
+                      setEditedContact({ ...editedContact, cell: e.target.value })
+                    }
+                    placeholder="Enter cell phone"
+                    className="w-full"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contact-email" className="text-sm font-medium text-gray-700">
+                  Email <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="contact-email"
+                  type="email"
+                  value={editedContact.email}
+                  onChange={(e) =>
+                    setEditedContact({ ...editedContact, email: e.target.value })
+                  }
+                  placeholder="Enter email address"
+                  className="w-full"
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditAddressDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => {
+                // Update the state with edited values
+                setCurrentResidentialAddress({ ...editedResidentialAddress });
+                setCurrentMailingAddress({ ...editedMailingAddress });
+                setCurrentContact({ ...editedContact });
+                setIsEditAddressDialogOpen(false);
+                // In a real application, you would also save this to your backend/database here
+              }}
+              disabled={!editedResidentialAddress.line1 || !editedResidentialAddress.line3 || !editedContact.email}
+            >
+              Save Changes
             </Button>
           </DialogFooter>
         </DialogContent>
