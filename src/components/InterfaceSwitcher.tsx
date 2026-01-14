@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check, ChevronDown, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Popover,
   PopoverContent,
@@ -55,6 +56,23 @@ export const getInterfaceDisplayName = (interfaceType: InterfaceType): string =>
   return option?.label || 'OneBoss RepWeb';
 };
 
+const getInterfaceColor = (interfaceType: InterfaceType): string => {
+  switch (interfaceType) {
+    case 'oneboss-advisor':
+      return 'bg-blue-100 text-blue-700 border-blue-200';
+    case 'oneboss-dealer':
+      return 'bg-green-100 text-green-700 border-green-200';
+    case 'intermediary-advisor':
+      return 'bg-purple-100 text-purple-700 border-purple-200';
+    case 'intermediary-dealer':
+      return 'bg-orange-100 text-orange-700 border-orange-200';
+    case 'intermediary-client':
+      return 'bg-gray-100 text-gray-700 border-gray-200';
+    default:
+      return 'bg-gray-100 text-gray-700 border-gray-200';
+  }
+};
+
 export function InterfaceSwitcher() {
   const { currentInterface, setCurrentInterface } = useInterface();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -82,6 +100,12 @@ export function InterfaceSwitcher() {
           <span className="flex items-center gap-2">
             <Monitor className="h-4 w-4" />
             <span>Current: {currentDisplayName}</span>
+            <Badge 
+              variant="outline" 
+              className={cn("font-semibold", getInterfaceColor(currentInterface))}
+            >
+              Marsh, Antoine
+            </Badge>
             <ChevronDown className="h-4 w-4 ml-1" />
           </span>
         </Button>

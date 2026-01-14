@@ -3412,9 +3412,6 @@ const ClientDetails = () => {
               <h1 className="text-2xl font-bold text-gray-900">Client: {client.name.split(" ").reverse().join(", ")}</h1>
               <div className="flex items-center gap-2">
                 <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
-                  {clientDetails.representative.name}
-                </div>
-                <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
                   {clientDetails.representative.language}
                 </div>
                 <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
@@ -3592,14 +3589,14 @@ const ClientDetails = () => {
                   // Determine plan category display text
                   const getPlanCategoryText = () => {
                     if (plan.category === "Joint") {
-                      return `(${plan.type} Broker/Nominee, Joint) NOM ${plan.accountNumber} - 9823-2232`;
+                      return `(${plan.type} Broker/Nominee, Joint) NOM ${plan.accountNumber}`;
                     }
-                    return `(${plan.type} ${plan.name || "Client Name"}, ${plan.category}) - 9823-2232`;
+                    return `(${plan.type} ${plan.name || "Client Name"}, ${plan.category})`;
                   };
                   
                   return (
                     <div key={plan.id} className="border border-gray-300 rounded bg-white">
-                      <div className="bg-white text-gray-900 px-2.5 py-1.5 flex items-center justify-between border-b border-gray-200">
+                      <div className="bg-white text-gray-900 px-2.5 py-1.5 flex items-center gap-0.5 border-b border-gray-200">
                         <div className="flex items-center gap-1.5 flex-1 min-w-0">
                           <Folder className="h-3 w-3 text-gray-600 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
@@ -3613,17 +3610,17 @@ const ClientDetails = () => {
                                   setSelectedFundAccount(null);
                                   setSelectedTransaction(null);
                                 }}
-                              >{plan.accountNumber} {getPlanCategoryText()} Marsh, Antoine</span>
+                              >{plan.accountNumber} {getPlanCategoryText()}</span>
                             </p>
                             {plan.category === "Joint" && (
                               <p className="text-[9px] text-gray-700 mt-0.5">Joint with <span className="underline cursor-pointer">Armstrong, Oliver</span> (Primary)</p>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                          <span className="text-[10px] font-semibold text-gray-900 min-w-[75px] text-right">
+                        <div className="flex items-center gap-0.5 flex-shrink-0">
+                          <Badge className="bg-green-100 text-green-700 border-green-200 hover:bg-green-100 text-[10px] font-semibold whitespace-nowrap mr-12 px-2.5 py-1">
                             ${planTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </span>
+                          </Badge>
                           {(() => {
                               const isZeroBalance = planTotal === 0;
                               const priceStr = firstFund?.currentPrice || "$0.00";
@@ -3686,7 +3683,7 @@ const ClientDetails = () => {
                                   <Button 
                                     variant="ghost" 
                                     size="sm" 
-                                    className="h-5 w-5 p-0 hover:bg-gray-100"
+                                    className="h-5 w-5 p-0 hover:bg-gray-100 mr-24"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setDialogContext("plan");
@@ -4213,12 +4210,12 @@ const ClientDetails = () => {
             <div className="grid grid-cols-2 gap-1.5 auto-rows-min">
               {/* Residential Address Card - Full width */}
               <Card className="border border-gray-200 shadow-sm bg-white col-span-2">
-                <CardHeader className="pb-0.5 px-1.5 pt-1 relative">
+                <CardHeader className="pb-0.5 px-2 pt-1.5 relative">
                   <CardTitle className="text-[10px] font-semibold text-gray-900">Residential Address</CardTitle>
                   {clientDetails.mailingAddress && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className="absolute top-1 right-1.5 text-blue-600 cursor-help text-[10px] font-bold">*</span>
+                        <span className="absolute top-1.5 right-2 text-blue-600 cursor-help text-[10px] font-bold">*</span>
                       </TooltipTrigger>
                       <TooltipContent>
                         <div className="space-y-1">
@@ -4231,7 +4228,7 @@ const ClientDetails = () => {
                     </Tooltip>
                   )}
                 </CardHeader>
-                <CardContent className="pt-0 pb-1 px-1.5">
+                <CardContent className="pt-0 pb-1 px-2">
                   <p className="text-[10px] text-gray-700 break-words">
                     {clientDetails.residentialAddress.line1}
                     {clientDetails.residentialAddress.line2 && `, ${clientDetails.residentialAddress.line2}`}
@@ -4362,18 +4359,18 @@ const ClientDetails = () => {
                 </CardContent>
               </Card>
 
-              {/* Allocations Tile - Combined Asset, Geographic, and Sector - Full width, compact */}
+              {/* Allocations Tile - Combined Asset, Geographic, and Sector - Single column, same size as Client Exceptions */}
               <Card 
-                className="border border-gray-200 shadow-sm bg-white col-span-2 cursor-pointer hover:shadow-md hover:border-blue-300 transition-all duration-200"
+                className="border border-gray-200 shadow-sm bg-white cursor-pointer hover:shadow-md hover:border-blue-300 transition-all duration-200"
                 onClick={() => {
                   setChartsSubTab("allocations");
                   setClientViewTab("charts");
                 }}
               >
-                <CardHeader className="pb-0.5 px-1.5 pt-1">
+                <CardHeader className="pb-0.5 px-2 pt-1.5">
                   <CardTitle className="text-[10px] font-semibold text-gray-900">Allocations</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-2 px-1.5">
+                <CardContent className="pt-0 pb-1 px-2">
                   <div className="grid grid-cols-3 gap-0 w-full">
                     {/* Asset Allocation */}
                     <div className="flex flex-col items-center">
@@ -4483,45 +4480,45 @@ const ClientDetails = () => {
                 </CardContent>
               </Card>
               <Card className="border border-gray-200 shadow-sm bg-white">
-                <CardHeader className="pb-0 px-1 pt-0.5">
-                  <CardTitle className="text-[8px] font-semibold text-gray-900">Empty Tile</CardTitle>
+                <CardHeader className="pb-0.5 px-2 pt-1.5">
+                  <CardTitle className="text-[10px] font-semibold text-gray-900">Empty Tile</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-0.5 px-1">
+                <CardContent className="pt-0 pb-1 px-2">
                 </CardContent>
               </Card>
               <Card className="border border-gray-200 shadow-sm bg-white">
-                <CardHeader className="pb-0 px-1 pt-0.5">
-                  <CardTitle className="text-[8px] font-semibold text-gray-900">Empty Tile</CardTitle>
+                <CardHeader className="pb-0.5 px-2 pt-1.5">
+                  <CardTitle className="text-[10px] font-semibold text-gray-900">Empty Tile</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-0.5 px-1">
+                <CardContent className="pt-0 pb-1 px-2">
                 </CardContent>
               </Card>
               <Card className="border border-gray-200 shadow-sm bg-white">
-                <CardHeader className="pb-0 px-1 pt-0.5">
-                  <CardTitle className="text-[8px] font-semibold text-gray-900">Empty Tile</CardTitle>
+                <CardHeader className="pb-0.5 px-2 pt-1.5">
+                  <CardTitle className="text-[10px] font-semibold text-gray-900">Empty Tile</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-0.5 px-1">
+                <CardContent className="pt-0 pb-1 px-2">
                 </CardContent>
               </Card>
               <Card className="border border-gray-200 shadow-sm bg-white">
-                <CardHeader className="pb-0 px-1 pt-0.5">
-                  <CardTitle className="text-[8px] font-semibold text-gray-900">Empty Tile</CardTitle>
+                <CardHeader className="pb-0.5 px-2 pt-1.5">
+                  <CardTitle className="text-[10px] font-semibold text-gray-900">Empty Tile</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-0.5 px-1">
+                <CardContent className="pt-0 pb-1 px-2">
                 </CardContent>
               </Card>
               <Card className="border border-gray-200 shadow-sm bg-white">
-                <CardHeader className="pb-0 px-1 pt-0.5">
-                  <CardTitle className="text-[8px] font-semibold text-gray-900">Empty Tile</CardTitle>
+                <CardHeader className="pb-0.5 px-2 pt-1.5">
+                  <CardTitle className="text-[10px] font-semibold text-gray-900">Empty Tile</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-0.5 px-1">
+                <CardContent className="pt-0 pb-1 px-2">
                 </CardContent>
               </Card>
               <Card className="border border-gray-200 shadow-sm bg-white">
-                <CardHeader className="pb-0 px-1 pt-0.5">
-                  <CardTitle className="text-[8px] font-semibold text-gray-900">Empty Tile</CardTitle>
+                <CardHeader className="pb-0.5 px-2 pt-1.5">
+                  <CardTitle className="text-[10px] font-semibold text-gray-900">Empty Tile</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-0.5 px-1">
+                <CardContent className="pt-0 pb-1 px-2">
                 </CardContent>
               </Card>
             </div>
@@ -6119,7 +6116,7 @@ const ClientDetails = () => {
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900">
-                    7886147741 (RESP Family Client Name, Joint) 9823-2232 <span className="underline cursor-pointer">Marsh, Antoine</span>
+                    7886147741 (RESP Family Client Name, Joint)
                   </p>
                   <div className="mt-1">
                     <p className="text-xs text-gray-700">Joint with <span className="underline cursor-pointer">Armstrong, Oliver</span> (Primary)</p>
