@@ -4239,12 +4239,28 @@ const ClientDetails = () => {
                 </CardContent>
               </Card>
 
-              {/* Empty Tile - Small */}
-              <Card className="border border-gray-200 shadow-sm bg-white">
+              {/* Add a New Plan Button */}
+              <Card className="border border-gray-200 shadow-sm bg-white cursor-pointer hover:shadow-md transition-shadow">
                 <CardHeader className="pb-0.5 px-2 pt-1.5">
-                  <CardTitle className="text-[10px] font-semibold text-gray-900">Empty Tile</CardTitle>
+                  <CardTitle className="text-[10px] font-semibold text-gray-900">Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0 pb-1.5 px-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full h-7 text-[9px] font-medium text-gray-700 hover:bg-gray-50 border-gray-300"
+                    onClick={() => {
+                      setClientViewTab("plans");
+                      setIsSelectPlanTypeOpen(true);
+                      setSelectedPlanType("");
+                      setPlanSetupStep(0);
+                      const currentClient = CLIENTS.find((c) => c.id === id);
+                      setOwnerName(currentClient?.name || "");
+                    }}
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add a New Plan
+                  </Button>
                 </CardContent>
               </Card>
 
