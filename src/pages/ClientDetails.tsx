@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip as RechartsTooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, AreaChart, Area, LineChart, Line } from "recharts";
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -70,6 +70,8 @@ import {
   Building2,
   Eye,
   EyeOff,
+  Lock,
+  Unlock,
   Mic,
   Package,
   ArrowRight,
@@ -224,6 +226,8 @@ const ClientDetails = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("investments");
   const [clientViewTab, setClientViewTab] = useState("summary");
+  const [isPageLocked, setIsPageLocked] = useState(false);
+  const [lockedTab, setLockedTab] = useState<string>("summary");
   const [showHiddenTabs, setShowHiddenTabs] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("Active");
@@ -2360,6 +2364,32 @@ const ClientDetails = () => {
     }
   }, [id]);
 
+  // Track previous client ID to detect changes
+  const prevClientIdRef = useRef<string | undefined>(id);
+
+  // Handle tab navigation when client changes based on lock state
+  useEffect(() => {
+    // Only act when client ID actually changes
+    if (prevClientIdRef.current !== id) {
+      prevClientIdRef.current = id;
+      
+      if (isPageLocked) {
+        // When locked, keep the current tab (don't change it)
+        // lockedTab already contains the current tab
+      } else {
+        // When unlocked, reset to summary when client changes
+        setClientViewTab("summary");
+      }
+    }
+  }, [id, isPageLocked]);
+
+  // Update locked tab when tab changes while locked
+  useEffect(() => {
+    if (isPageLocked) {
+      setLockedTab(clientViewTab);
+    }
+  }, [clientViewTab, isPageLocked]);
+
   // Initialize all plans as collapsed by default
   useEffect(() => {
     const currentClientData = getClientData(id);
@@ -3495,34 +3525,59 @@ const ClientDetails = () => {
               >
                 Trading
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0"
-                onClick={() => {
-                  const hiddenTabValues = ["questionnaires", "client-reports", "charts", "approvals", "attachments"];
-                  const isCurrentlyVisible = showHiddenTabs.has(client.id);
-                  if (isCurrentlyVisible && hiddenTabValues.includes(clientViewTab)) {
-                    setClientViewTab("summary");
-                  }
-                  setShowHiddenTabs(prev => {
-                    const newSet = new Set(prev);
-                    if (newSet.has(client.id)) {
-                      newSet.delete(client.id);
-                    } else {
-                      newSet.add(client.id);
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={() => {
+                    const hiddenTabValues = ["questionnaires", "client-reports", "charts", "approvals", "attachments"];
+                    const isCurrentlyVisible = showHiddenTabs.has(client.id);
+                    if (isCurrentlyVisible && hiddenTabValues.includes(clientViewTab)) {
+                      setClientViewTab("summary");
                     }
-                    return newSet;
-                  });
-                }}
-                title={showHiddenTabs.has(client.id) ? "Hide tabs" : "Show tabs"}
-              >
-                {showHiddenTabs.has(client.id) ? (
-                  <Eye className="h-4 w-4 text-gray-600" />
-                ) : (
-                  <EyeOff className="h-4 w-4 text-gray-600" />
-                )}
-              </Button>
+                    setShowHiddenTabs(prev => {
+                      const newSet = new Set(prev);
+                      if (newSet.has(client.id)) {
+                        newSet.delete(client.id);
+                      } else {
+                        newSet.add(client.id);
+                      }
+                      return newSet;
+                    });
+                  }}
+                  title={showHiddenTabs.has(client.id) ? "Hide tabs" : "Show tabs"}
+                >
+                  {showHiddenTabs.has(client.id) ? (
+                    <Eye className="h-4 w-4 text-gray-600" />
+                  ) : (
+                    <EyeOff className="h-4 w-4 text-gray-600" />
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`absolute -top-1 -right-1 h-2.5 w-2.5 p-0 hover:bg-transparent ${isPageLocked ? "text-blue-600" : "text-gray-600"}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsPageLocked(prev => {
+                      const newLocked = !prev;
+                      if (newLocked) {
+                        // When locking, save current tab
+                        setLockedTab(clientViewTab);
+                      }
+                      return newLocked;
+                    });
+                  }}
+                  title={isPageLocked ? "Unlock page - will reset to Summary when switching clients" : "Lock page - will stay on current page when switching clients"}
+                >
+                  {isPageLocked ? (
+                    <Lock className="h-1.5 w-1.5" />
+                  ) : (
+                    <Unlock className="h-1.5 w-1.5" />
+                  )}
+                </Button>
+              </div>
               {showHiddenTabs.has(client.id) && (
                 <>
                   <Button
