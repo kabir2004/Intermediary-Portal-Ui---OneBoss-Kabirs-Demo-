@@ -22,7 +22,6 @@ export function Navbar({ className, onMenuClick }: NavbarProps) {
     <header className={cn("bg-white z-30", className)}>
       <div className="w-full flex items-center justify-between h-16 px-4 lg:px-6">
         <div className="flex items-center gap-3">
-          <SidebarTrigger />
           <InterfaceSwitcher />
         </div>
         

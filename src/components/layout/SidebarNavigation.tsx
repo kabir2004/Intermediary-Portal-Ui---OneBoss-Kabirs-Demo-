@@ -9,6 +9,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -34,6 +36,8 @@ import {
   HandCoins,
   CheckCircle2,
   BarChart3,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -157,6 +161,7 @@ export function SidebarNavigation() {
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const { currentInterface, isIntermediaryInterface } = useInterface();
   const { isMenuHidden } = useMenuVisibility();
+  const { state, toggleSidebar } = useSidebar();
 
   // Auto-expand clients dropdown when on clients page, client details page, or related pages
   useEffect(() => {
@@ -222,11 +227,25 @@ export function SidebarNavigation() {
   return (
     <Sidebar collapsible="icon" variant="inset" className="bg-white [&>div>div]:!border-0 [&>div>div>div]:!border-0">
       <SidebarHeader className="bg-white !border-0 pb-0">
-        <div className="flex items-center gap-3 px-3 py-4">
+        <div className="flex items-center justify-between gap-3 px-3 py-4 group-data-[collapsible=icon]:justify-center">
           <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
             <h2 className="text-base font-semibold text-gray-900 leading-tight">OneBoss</h2>
             <p className="text-xs text-gray-600 leading-tight">Welcome Back, Nelson</p>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex-shrink-0"
+            onClick={toggleSidebar}
+            title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            {state === "expanded" ? (
+              <ChevronLeft className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
+            <span className="sr-only">Toggle Sidebar</span>
+          </Button>
         </div>
       </SidebarHeader>
       <SidebarContent className="bg-white">
