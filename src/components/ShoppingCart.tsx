@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 
 interface Trade {
@@ -50,6 +51,7 @@ export function ShoppingCart({ children }: ShoppingCartProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [expandedPlans, setExpandedPlans] = useState<Set<string>>(new Set());
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   // Mock data - matching the image exactly
   const cartData: (AdvisorCart | ClientCart)[] = [
@@ -183,6 +185,17 @@ export function ShoppingCart({ children }: ShoppingCartProps) {
     setExpandedPlans(newExpanded);
   };
 
+  const toggleSelection = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newSelected = new Set(selectedItems);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedItems(newSelected);
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -215,6 +228,20 @@ export function ShoppingCart({ children }: ShoppingCartProps) {
                     onClick={() => toggleItem(item.id)}
                   >
                     <div className="flex items-center gap-3 flex-1">
+                      <Checkbox
+                        checked={selectedItems.has(item.id)}
+                        onCheckedChange={() => {
+                          const newSelected = new Set(selectedItems);
+                          if (newSelected.has(item.id)) {
+                            newSelected.delete(item.id);
+                          } else {
+                            newSelected.add(item.id);
+                          }
+                          setSelectedItems(newSelected);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="mr-1"
+                      />
                       <div className="flex items-center gap-2">
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4 text-gray-500" />
