@@ -227,7 +227,7 @@ export function SidebarNavigation() {
   return (
     <Sidebar collapsible="icon" variant="inset" className="bg-white [&>div>div]:!border-0 [&>div>div>div]:!border-0">
       <SidebarHeader className="bg-white !border-0 pb-0">
-        <div className="flex items-center justify-between gap-3 px-3 py-4 group-data-[collapsible=icon]:justify-center">
+        <div className="flex items-center justify-between gap-3 px-3 py-4 group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:justify-center">
           <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
             <h2 className="text-base font-semibold text-gray-900 leading-tight">OneBoss</h2>
             <p className="text-xs text-gray-600 leading-tight">Welcome Back, Nelson</p>
@@ -235,7 +235,7 @@ export function SidebarNavigation() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex-shrink-0"
+            className="h-7 w-7 text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex-shrink-0 group-data-[collapsible=icon]:!h-8 group-data-[collapsible=icon]:!w-8 group-data-[collapsible=icon]:mx-2 group-data-[collapsible=icon]:text-gray-700 group-data-[collapsible=icon]:hover:bg-gray-50"
             onClick={toggleSidebar}
             title={state === "expanded" ? "Collapse sidebar" : "Expand sidebar"}
           >
