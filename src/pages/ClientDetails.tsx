@@ -3462,8 +3462,8 @@ const ClientDetails = () => {
                 <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
                   {clientDetails.representative.language}
                 </div>
-                <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
-                  Empty Tile
+                <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap font-bold">
+                  Account {client.id}
                 </div>
               </div>
             </div>
@@ -3480,9 +3480,6 @@ const ClientDetails = () => {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <p className="text-sm text-gray-600">Account {client.id}</p>
           </div>
         </div>
 
