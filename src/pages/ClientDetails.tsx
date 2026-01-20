@@ -3459,11 +3459,11 @@ const ClientDetails = () => {
             <div className="flex items-center gap-4">
               <h1 className="text-2xl font-bold text-gray-900">Client: {client.name.split(" ").reverse().join(", ")}</h1>
               <div className="flex items-center gap-2">
-                <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
-                  {clientDetails.representative.language}
-                </div>
                 <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap font-bold">
                   Account {client.id}
+                </div>
+                <div className="px-3 py-1.5 border border-gray-300 rounded text-sm text-gray-700 whitespace-nowrap">
+                  {clientDetails.representative.language}
                 </div>
               </div>
             </div>
