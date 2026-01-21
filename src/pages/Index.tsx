@@ -119,8 +119,8 @@ const Index = () => {
 
   const allWidgets = [
     { id: 'assetsByPlanType', name: 'Assets By Plan Type' },
-    { id: 'assetsBySupplier', name: 'Assets By Supplier' },
-    { id: 'eStatementSignup', name: 'eStatement Signup' },
+    { id: 'assetsBySupplier', name: 'Total Assets' },
+    { id: 'eStatementSignup', name: 'KYC' },
     { id: 'topFiveClients', name: 'Analyze My Book' },
     { id: 'topFiveProducts', name: 'Top Five Products' },
     { id: 'topFiveProductsPerformance', name: 'Top Five Products Performance' },
@@ -415,9 +415,20 @@ const Index = () => {
     { name: 'Other', value: 45, color: '#e5e7eb' },
   ];
 
+  const totalAssetsData = [
+    { name: 'Net Invested', value: 60, color: '#3b82f6' },
+    { name: 'Growth', value: 40, color: '#10b981' },
+  ];
+
   const eStatementData = [
     { name: 'eStatement', value: 25, color: '#10b981' },
     { name: 'Mail Delivery', value: 75, color: '#e5e7eb' },
+  ];
+
+  const kycData = [
+    { name: 'Expired', value: 20, color: '#ef4444' },
+    { name: 'Expiring < 60 Days', value: 15, color: '#f59e0b' },
+    { name: 'Valid', value: 65, color: '#10b981' },
   ];
 
   const topClients = [
@@ -1140,14 +1151,14 @@ const Index = () => {
                 <CardTitle className="text-sm font-semibold text-gray-900">Assets By Plan Type</CardTitle>
             </CardHeader>
             <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
+                <ResponsiveContainer width="100%" height={150}>
                   <PieChart>
                     <Pie
                       data={assetsByPlanType}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      outerRadius={70}
+                      outerRadius={55}
                       fill="#8884d8"
                       dataKey="value"
                     >
@@ -1156,90 +1167,124 @@ const Index = () => {
                       ))}
                     </Pie>
                     <Tooltip />
-                    <Legend 
-                      verticalAlign="bottom" 
-                      height={36}
-                      formatter={(value: string, entry: any) => `${entry.payload.name} ${entry.payload.value}%`}
-                      wrapperStyle={{ color: '#000000', fill: '#000000' }}
-                      contentStyle={{ color: '#000000', fill: '#000000' }}
-                      iconType="circle"
-                    />
                   </PieChart>
                 </ResponsiveContainer>
+                <div className="mt-3 space-y-1.5">
+                  <div className="flex items-center justify-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                      <span className="text-sm text-gray-700">RRSP</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="text-sm text-gray-700">RRIF</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                      <span className="text-sm text-gray-700">OPEN</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+                      <span className="text-sm text-gray-700">Other</span>
+                    </div>
+                  </div>
+                </div>
             </CardContent>
           </Card>
             )}
 
-            {/* Assets By Supplier */}
+            {/* Total Assets */}
             {activeWidgets.has('assetsBySupplier') && (
           <Card className="border border-gray-200 shadow-sm bg-white">
             <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold text-gray-900">Assets By Supplier</CardTitle>
+                <CardTitle className="text-sm font-semibold text-gray-900">Total Assets</CardTitle>
             </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
+                <ResponsiveContainer width="100%" height={150}>
                   <PieChart>
                     <Pie
-                      data={assetsBySupplier}
+                      data={totalAssetsData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      outerRadius={70}
+                      outerRadius={55}
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {assetsBySupplier.map((entry, index) => (
+                      {totalAssetsData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip />
-                    <Legend 
-                      verticalAlign="bottom" 
-                      height={36}
-                      formatter={(value: string, entry: any) => `${entry.payload.name} ${entry.payload.value}%`}
-                      wrapperStyle={{ color: '#000000', fill: '#000000' }}
-                      contentStyle={{ color: '#000000', fill: '#000000' }}
-                      iconType="circle"
-                    />
                   </PieChart>
                 </ResponsiveContainer>
+                <div className="mt-3 space-y-1.5">
+                  <div className="flex items-center justify-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                      <span className="text-sm text-gray-700">Net Invested</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="text-sm text-gray-700">Growth</span>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <span className="text-sm text-gray-700">IRR</span>
+                  </div>
+                  <div className="text-center">
+                    <span className="text-sm font-semibold text-gray-900">Total Assets</span>
+                  </div>
+                </div>
             </CardContent>
           </Card>
             )}
 
-            {/* eStatement Signup */}
+            {/* KYC */}
             {activeWidgets.has('eStatementSignup') && (
             <Card className="border border-gray-200 shadow-sm bg-white">
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-semibold text-gray-900">eStatement Signup</CardTitle>
+                <CardTitle className="text-sm font-semibold text-gray-900">KYC</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
+                <ResponsiveContainer width="100%" height={150}>
                   <PieChart>
                     <Pie
-                      data={eStatementData}
+                      data={kycData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
+                      labelLine={false}
+                      outerRadius={55}
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {eStatementData.map((entry, index) => (
+                      {kycData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip />
-                    <Legend 
-                      verticalAlign="bottom" 
-                      height={36}
-                      formatter={(value: string, entry: any) => `${entry.payload.name} ${entry.payload.value}%`}
-                      wrapperStyle={{ color: '#000000', fill: '#000000' }}
-                      contentStyle={{ color: '#000000', fill: '#000000' }}
-                      iconType="circle"
-                    />
                   </PieChart>
                 </ResponsiveContainer>
+                <div className="mt-3 space-y-1.5">
+                  <div className="flex items-center justify-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <span className="text-sm text-gray-700">Expired</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                      <span className="text-sm text-gray-700">Expiring &lt; 60 Days</span>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="text-sm text-gray-700">Valid</span>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
             )}
