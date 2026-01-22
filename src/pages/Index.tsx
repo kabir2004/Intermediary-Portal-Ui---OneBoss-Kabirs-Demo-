@@ -401,12 +401,6 @@ const Index = () => {
   const maxAmount = Math.max(...fundCategories.map(cat => cat.amount));
 
   // Charts and Analytics data
-  const assetsByPlanType = [
-    { name: 'RRSP', value: 28, color: '#3b82f6' },
-    { name: 'RRIF', value: 20, color: '#10b981' },
-    { name: 'OPEN', value: 16, color: '#8b5cf6' },
-    { name: 'Other', value: 36, color: '#e5e7eb' },
-  ];
 
   const assetsBySupplier = [
     { name: 'CIG', value: 27, color: '#f97316' },
@@ -415,9 +409,17 @@ const Index = () => {
     { name: 'Other', value: 45, color: '#e5e7eb' },
   ];
 
+  // Total Assets data with dollar amounts
+  // Using the AUM from statsCards: $127,400,000
+  const totalAUM = 127400000;
+  const netInvestedAmount = Math.round(totalAUM * 0.60); // 60% of total
+  const growthAmount = Math.round(totalAUM * 0.30); // 30% of total
+  const irrAmount = Math.round(totalAUM * 0.10); // 10% of total
+  
   const totalAssetsData = [
-    { name: 'Net Invested', value: 60, color: '#3b82f6' },
-    { name: 'Growth', value: 40, color: '#10b981' },
+    { name: 'Net Invested', value: 60, color: '#3b82f6', amount: netInvestedAmount },
+    { name: 'Growth', value: 30, color: '#10b981', amount: growthAmount },
+    { name: 'IRR', value: 10, color: '#8b5cf6', amount: irrAmount },
   ];
 
   const eStatementData = [
@@ -425,10 +427,16 @@ const Index = () => {
     { name: 'Mail Delivery', value: 75, color: '#e5e7eb' },
   ];
 
+  // KYC data with dollar amounts and counts
+  // Based on total AUM: $127,400,000
+  const expiredKYCAmount = 25480000; // 20% of total
+  const expiringKYCAmount = 19110000; // 15% of total
+  const validKYCAmount = 82781000; // 65% of total
+  
   const kycData = [
-    { name: 'Expired', value: 20, color: '#ef4444' },
-    { name: 'Expiring < 60 Days', value: 15, color: '#f59e0b' },
-    { name: 'Valid', value: 65, color: '#10b981' },
+    { name: 'Expired', value: 20, color: '#ef4444', amount: expiredKYCAmount, count: 8 },
+    { name: 'Expiring < 60 Days', value: 15, color: '#f59e0b', amount: expiringKYCAmount, count: 6 },
+    { name: 'Valid', value: 65, color: '#10b981', amount: validKYCAmount, count: 26 },
   ];
 
   const topClients = [
@@ -499,10 +507,12 @@ const Index = () => {
     { type: 'RRIF', count: 5, aua: 185000, hoverColor: 'hover:bg-purple-50 hover:border-purple-200' },
     { type: 'RRSP', count: 12, aua: 385000, hoverColor: 'hover:bg-green-50 hover:border-green-200' },
     { type: 'RESP', count: 4, aua: 125000, hoverColor: 'hover:bg-yellow-50 hover:border-yellow-200' },
+    { type: 'OPEN', count: 6, aua: 285000, hoverColor: 'hover:bg-gray-50 hover:border-gray-200' },
     { type: 'Non-Registered', count: 6, aua: 285000, hoverColor: 'hover:bg-gray-50 hover:border-gray-200' },
     { type: 'LIRA', count: 2, aua: 95000, hoverColor: 'hover:bg-indigo-50 hover:border-indigo-200' },
     { type: 'LIF', count: 1, aua: 45000, hoverColor: 'hover:bg-pink-50 hover:border-pink-200' },
     { type: 'RDSP', count: 1, aua: 35000, hoverColor: 'hover:bg-orange-50 hover:border-orange-200' },
+    { type: 'Other', count: 3, aua: 120000, hoverColor: 'hover:bg-slate-50 hover:border-slate-200' },
   ];
 
   // Format currency helper
@@ -517,6 +527,37 @@ const Index = () => {
 
   // Calculate total plans
   const totalPlans = planTypes.reduce((sum, plan) => sum + plan.count, 0);
+  
+  // Calculate total AUA for percentage calculation
+  const totalAUA = planTypes.reduce((sum, plan) => sum + plan.aua, 0);
+  
+  // Calculate AUA for the four plan types (RRSP, RRIF, OPEN, Other) for Assets By Plan Type chart
+  const rrspAUA = planTypes.find(p => p.type === 'RRSP')?.aua || 0;
+  const rrifAUA = planTypes.find(p => p.type === 'RRIF')?.aua || 0;
+  const openAUA = planTypes.find(p => p.type === 'OPEN')?.aua || 0;
+  const otherAUA = planTypes.find(p => p.type === 'Other')?.aua || 0;
+  
+  // Calculate total AUA for these four types
+  const totalSelectedAUA = rrspAUA + rrifAUA + openAUA + otherAUA;
+  
+  // Calculate percentages that total to 100%
+  const calculatePercentage = (aua: number) => {
+    if (totalSelectedAUA === 0) return 0;
+    return (aua / totalSelectedAUA) * 100;
+  };
+  
+  const rrspPercentage = calculatePercentage(rrspAUA);
+  const rrifPercentage = calculatePercentage(rrifAUA);
+  const openPercentage = calculatePercentage(openAUA);
+  const otherPercentage = calculatePercentage(otherAUA);
+  
+  // Charts and Analytics data
+  const assetsByPlanType = [
+    { name: 'RRSP', value: rrspPercentage, color: '#3b82f6', percentage: rrspPercentage, count: planTypes.find(p => p.type === 'RRSP')?.count || 0 },
+    { name: 'RRIF', value: rrifPercentage, color: '#10b981', percentage: rrifPercentage, count: planTypes.find(p => p.type === 'RRIF')?.count || 0 },
+    { name: 'OPEN', value: openPercentage, color: '#8b5cf6', percentage: openPercentage, count: planTypes.find(p => p.type === 'OPEN')?.count || 0 },
+    { name: 'Other', value: otherPercentage, color: '#e5e7eb', percentage: otherPercentage, count: planTypes.find(p => p.type === 'Other')?.count || 0 },
+  ];
 
   const transactions = [
     { name: 'Smith Trust - Fund Purchase', time: 'Today • 2:45 PM', amount: '-$25,000.00', isNegative: true, icon: HandCoins },
@@ -840,18 +881,26 @@ const Index = () => {
             {isPlansExpanded && (
               <CardContent className="pt-0 pb-3">
                 <div className="space-y-1.5">
-                  {planTypes.map((plan, index) => (
-                    <div
-                      key={index}
-                      className={`flex items-center justify-between p-2 rounded-lg border border-gray-200 ${plan.hoverColor} transition-colors`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-gray-900">{plan.type}:</span>
-                        <span className="text-xs text-gray-700">{formatCurrency(plan.aua)}</span>
+                  {planTypes.map((plan, index) => {
+                    const percentage = totalAUA > 0 ? ((plan.aua / totalAUA) * 100).toFixed(1) : '0.0';
+                    const showPercentage = ['RRSP', 'RRIF', 'OPEN', 'Other'].includes(plan.type);
+                    
+                    return (
+                      <div
+                        key={index}
+                        className={`flex items-center justify-between p-2 rounded-lg border border-gray-200 ${plan.hoverColor} transition-colors`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-gray-900">{plan.type}:</span>
+                          <span className="text-xs text-gray-700">{formatCurrency(plan.aua)}</span>
+                          {showPercentage && (
+                            <span className="text-xs text-gray-500">({percentage}%)</span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-600">({plan.count} accounts)</span>
                       </div>
-                      <span className="text-xs text-gray-600">({plan.count} accounts)</span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             )}
@@ -1166,28 +1215,43 @@ const Index = () => {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip 
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          const count = data.count || 0;
+                          const name = data.name || '';
+                          return (
+                            <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-2">
+                              <p className="text-sm font-medium text-gray-900">{name}:</p>
+                              <p className="text-sm text-gray-700">{count} {count === 1 ? 'Plan' : 'Plans'}</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="mt-3 space-y-1.5">
                   <div className="flex items-center justify-center gap-4">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                      <span className="text-sm text-gray-700">RRSP</span>
+                      <span className="text-xs text-gray-700">RRSP: {rrspPercentage.toFixed(1)}%</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span className="text-sm text-gray-700">RRIF</span>
+                      <span className="text-xs text-gray-700">RRIF: {rrifPercentage.toFixed(1)}%</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-center gap-4">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                      <span className="text-sm text-gray-700">OPEN</span>
+                      <span className="text-xs text-gray-700">OPEN: {openPercentage.toFixed(1)}%</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-                      <span className="text-sm text-gray-700">Other</span>
+                      <span className="text-xs text-gray-700">Other: {otherPercentage.toFixed(1)}%</span>
                     </div>
                   </div>
                 </div>
@@ -1217,25 +1281,43 @@ const Index = () => {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip 
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          const amount = data.amount || 0;
+                          const name = data.name || '';
+                          return (
+                            <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-2">
+                              <p className="text-sm font-medium text-gray-900">{name}:</p>
+                              <p className="text-sm text-gray-700">{formatCurrency(amount)}</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="mt-3 space-y-1.5">
                   <div className="flex items-center justify-center gap-4">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                      <span className="text-sm text-gray-700">Net Invested</span>
+                      <span className="text-xs text-gray-700">Net Invested: {formatCurrency(netInvestedAmount)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span className="text-sm text-gray-700">Growth</span>
+                      <span className="text-xs text-gray-700">Growth: {formatCurrency(growthAmount)}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                      <span className="text-xs text-gray-700">IRR: {formatCurrency(irrAmount)}</span>
                     </div>
                   </div>
                   <div className="text-center">
-                    <span className="text-sm text-gray-700">IRR</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="text-sm font-semibold text-gray-900">Total Assets</span>
+                    <span className="text-xs font-semibold text-gray-900">Total Assets</span>
                   </div>
                 </div>
             </CardContent>
@@ -1264,24 +1346,39 @@ const Index = () => {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip 
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          const count = data.count || 0;
+                          const name = data.name || '';
+                          return (
+                            <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-2">
+                              <p className="text-sm font-medium text-gray-900">{name}:</p>
+                              <p className="text-sm text-gray-700">{count}</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="mt-3 space-y-1.5">
                   <div className="flex items-center justify-center gap-4">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <span className="text-sm text-gray-700">Expired</span>
+                      <span className="text-xs text-gray-700">Expired: 20%</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-                      <span className="text-sm text-gray-700">Expiring &lt; 60 Days</span>
+                      <span className="text-xs text-gray-700">Expiring &lt; 60 Days: 15%</span>
                     </div>
                   </div>
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span className="text-sm text-gray-700">Valid</span>
+                      <span className="text-xs text-gray-700">Valid: 65%</span>
                     </div>
                   </div>
                 </div>
