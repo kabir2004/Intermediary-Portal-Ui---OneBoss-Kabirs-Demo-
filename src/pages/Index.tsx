@@ -414,12 +414,11 @@ const Index = () => {
   const totalAUM = 127400000;
   const netInvestedAmount = Math.round(totalAUM * 0.60); // 60% of total
   const growthAmount = Math.round(totalAUM * 0.30); // 30% of total
-  const irrAmount = Math.round(totalAUM * 0.10); // 10% of total
+  const irrPercentage = 18.5; // IRR as percentage
   
   const totalAssetsData = [
     { name: 'Net Invested', value: 60, color: '#3b82f6', amount: netInvestedAmount },
     { name: 'Growth', value: 30, color: '#10b981', amount: growthAmount },
-    { name: 'IRR', value: 10, color: '#8b5cf6', amount: irrAmount },
   ];
 
   const eStatementData = [
@@ -1313,7 +1312,7 @@ const Index = () => {
                   <div className="flex items-center justify-center gap-4">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                      <span className="text-xs text-gray-700">IRR: {formatCurrency(irrAmount)}</span>
+                      <span className="text-xs text-gray-700">IRR: {irrPercentage}%</span>
                     </div>
                   </div>
                   <div className="text-center">
