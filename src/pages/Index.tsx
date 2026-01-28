@@ -1227,6 +1227,10 @@ const Index = () => {
                       outerRadius={55}
                       fill="#8884d8"
                       dataKey="value"
+                      isAnimationActive
+                      animationDuration={400}
+                      animationBegin={0}
+                      animationEasing="cubic-bezier(0.33, 1, 0.68, 1)"
                     >
                       {assetsByPlanType.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -1319,7 +1323,7 @@ const Index = () => {
                         fill="#8884d8"
                         dataKey="value"
                         isAnimationActive
-                        animationDuration={320}
+                        animationDuration={400}
                         animationBegin={0}
                         animationEasing="cubic-bezier(0.33, 1, 0.68, 1)"
                       >
@@ -1408,6 +1412,10 @@ const Index = () => {
                       outerRadius={55}
                       fill="#8884d8"
                       dataKey="value"
+                      isAnimationActive
+                      animationDuration={400}
+                      animationBegin={0}
+                      animationEasing="cubic-bezier(0.33, 1, 0.68, 1)"
                     >
                       {kycData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
