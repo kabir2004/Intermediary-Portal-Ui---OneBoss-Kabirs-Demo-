@@ -117,6 +117,10 @@ const Index = () => {
     'topFiveClients'
   ]));
 
+  // Total Assets widget: toggle between 2-slice (Net Invested/Growth) and 4-slice AUA/AUM split
+  const [splitView, setSplitView] = useState(false);
+  const [totalAssetsChartHovered, setTotalAssetsChartHovered] = useState(false);
+
   const allWidgets = [
     { id: 'assetsByPlanType', name: 'Assets By Plan Type' },
     { id: 'assetsBySupplier', name: 'Total Assets' },
@@ -419,6 +423,20 @@ const Index = () => {
   const totalAssetsData = [
     { name: 'Net Invested', value: 60, color: '#3b82f6', amount: netInvestedAmount },
     { name: 'Growth', value: 30, color: '#10b981', amount: growthAmount },
+  ];
+
+  // 4-slice AUA/AUM split view (splitView=true): same totals, split by AUA/AUM ratios
+  const NET_INV_AUM = 0.60;
+  const GROWTH_AUM = 0.60;
+  const NET_INV_AUA = 1 - NET_INV_AUM;
+  const GROWTH_AUA = 1 - GROWTH_AUM;
+  const netInvestedTotal = netInvestedAmount; // 76,440,000 (already shown in widget)
+  const growthTotal = growthAmount; // 38,220,000 (already shown in widget)
+  const totalAssetsSplitData = [
+    { key: 'net-aua', name: 'Net Invested (AUA)', value: Math.round(netInvestedTotal * NET_INV_AUA), color: '#3b82f6', pattern: false },
+    { key: 'net-aum', name: 'Net Invested (AUM)', value: Math.round(netInvestedTotal * NET_INV_AUM), color: '#3b82f6', pattern: true },
+    { key: 'growth-aua', name: 'Growth (AUA)', value: Math.round(growthTotal * GROWTH_AUA), color: '#10b981', pattern: false },
+    { key: 'growth-aum', name: 'Growth (AUM)', value: Math.round(growthTotal * GROWTH_AUM), color: '#10b981', pattern: true },
   ];
 
   const eStatementData = [
@@ -1265,39 +1283,89 @@ const Index = () => {
                 <CardTitle className="text-sm font-semibold text-gray-900">Total Assets</CardTitle>
             </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={150}>
-                  <PieChart>
-                    <Pie
-                      data={totalAssetsData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={55}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {totalAssetsData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          const data = payload[0].payload;
-                          const amount = data.amount || 0;
-                          const name = data.name || '';
-                          return (
-                            <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-2">
-                              <p className="text-sm font-medium text-gray-900">{name}:</p>
-                              <p className="text-sm text-gray-700">{formatCurrency(amount)}</p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSplitView(v => !v)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSplitView(v => !v); } }}
+                  onMouseEnter={() => setTotalAssetsChartHovered(true)}
+                  onMouseLeave={() => setTotalAssetsChartHovered(false)}
+                  aria-label="Toggle AUA/AUM split"
+                  className="cursor-pointer transition-[opacity,transform] duration-200 ease-out"
+                  style={{ outline: 'none' }}
+                >
+                  {splitView && (
+                    <svg width={0} height={0} aria-hidden="true">
+                      <defs>
+                        <pattern id="blueHatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                          <rect width="8" height="8" fill="#3b82f6" />
+                          <line x1="0" y1="4" x2="8" y2="4" stroke="#ffffff" strokeWidth="1.5" opacity="1" />
+                        </pattern>
+                        <pattern id="greenHatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                          <rect width="8" height="8" fill="#10b981" />
+                          <line x1="0" y1="4" x2="8" y2="4" stroke="#ffffff" strokeWidth="1.5" opacity="1" />
+                        </pattern>
+                      </defs>
+                    </svg>
+                  )}
+                  <ResponsiveContainer width="100%" height={150}>
+                    <PieChart>
+                      <Pie
+                        data={splitView ? totalAssetsSplitData : totalAssetsData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={55}
+                        fill="#8884d8"
+                        dataKey="value"
+                        isAnimationActive
+                        animationDuration={320}
+                        animationBegin={0}
+                        animationEasing="cubic-bezier(0.33, 1, 0.68, 1)"
+                      >
+                        {splitView
+                          ? totalAssetsSplitData.map((entry, index) => (
+                              <Cell
+                                key={entry.key}
+                                fill={entry.pattern ? (entry.color === '#3b82f6' ? 'url(#blueHatch)' : 'url(#greenHatch)') : entry.color}
+                              />
+                            ))
+                          : totalAssetsData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                      </Pie>
+                      <Tooltip 
+                        cursor={false}
+                        wrapperStyle={{ pointerEvents: 'none' }}
+                        content={({ active, payload }) => {
+                          if (!totalAssetsChartHovered) return null;
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            if (splitView) {
+                              const value = data.value != null ? data.value : 0;
+                              const name = data.name || '';
+                              return (
+                                <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-2">
+                                  <p className="text-sm font-medium text-gray-900">{name}:</p>
+                                  <p className="text-sm text-gray-700">{formatCurrency(value)}</p>
+                                </div>
+                              );
+                            }
+                            const amount = data.amount || 0;
+                            const name = data.name || '';
+                            return (
+                              <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-2">
+                                <p className="text-sm font-medium text-gray-900">{name}:</p>
+                                <p className="text-sm text-gray-700">{formatCurrency(amount)}</p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
                 <div className="mt-3 space-y-1.5">
                   <div className="flex items-center justify-center gap-4">
                     <div className="flex items-center gap-2">
